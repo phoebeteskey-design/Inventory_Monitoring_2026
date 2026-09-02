@@ -1,0 +1,24 @@
+---
+title: "Lab2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(tidyverse)
+grass <- read.csv("../data_raw/Lab1 Inv.csv")
+mean(grass$Weightg)
+var(grass$Weightg)
+sd(grass$Weightg)
+```
+
+
+```{r}
+mean(grass$Heightcm)
+sd(grass$Heightcm)
+```
+
+
+
+
