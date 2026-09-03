@@ -7,18 +7,202 @@ output:
 
 ```{r}
 library(tidyverse)
-grass <- read.csv("../data_raw/Lab1 Inv.csv")
-mean(grass$Weightg)
-var(grass$Weightg)
-sd(grass$Weightg)
+library(plotrix)
+
+grass <- read_csv("../data_raw/Site 1.csv")
+```
+
+# For the height and weight of plants on each site, calculate the mean, variance, standard deviation, coefficient of variation, and the standard error of the mean.
+
+For weight on Site 1:
+
+```{r}
+mean(grass$weight_g)
+var(grass$weight_g)
+sd(grass$weight_g)
+```
+Mean weight: 9.55
+Variance in weight: 6.29
+Standard deviation in weight: 2.5
+Coefficient of variation: sd/mean
+
+```{r}
+sd(grass$weight_g)/mean(grass$weight_g)
+```
+
+Standard error of the mean
+
+```{r}
+std.error(grass$weight_g)
+```
+
+For height on Site 1:
+
+```{r}
+mean(grass$height_cm)
+var(grass$height_cm)
+sd(grass$height_cm)
+```
+
+Mean height: 24
+Variance in height: 43.33
+Standard deviation in height: 6.58
+Coefficient of variation: sd/mean
+
+```{r}
+sd(grass$height_cm)/mean(grass$height_cm)
+```
+
+Standard error of the mean
+
+```{r}
+std.error(grass$height_cm)
+```
+
+For weight on Site 2:
+
+```{r}
+grass2 <- read_csv("../data_raw/Site 2.csv")
+mean(grass2$weight_g)
+var(grass2$weight_g)
+sd(grass2$weight_g)
+```
+
+Mean weight: 23.15
+Variance in weight: 17.02
+Standard deviation in weight: 4.13
+Coefficient of variation: sd/mean
+
+```{r}
+sd(grass2$weight_g)/mean(grass2$weight_g)
 ```
 
 
 ```{r}
-mean(grass$Heightcm)
-sd(grass$Heightcm)
+std.error(grass2$weight_g)
 ```
 
+Height for Site 2:
+
+```{r}
+mean(grass2$height_cm)
+var(grass2$height_cm)
+sd(grass2$height_cm)
+```
+
+Mean height: 56.1
+Variance in height: 578.54
+Standard deviation in height: 24.05
+Coefficient of variation: sd/mean
+
+```{r}
+sd(grass2$height_cm)/mean(grass2$height_cm)
+```
+
+
+```{r}
+std.error(grass2$height_cm)
+```
+
+
+# Using the weight data, determine if the difference between the sites is significant. Give a probability based on a T-test and use a graph to display the difference or lack of difference.
+
+
+```{r}
+t.test(grass$weight_g, grass2$weight_g)
+```
+
+The means are significantly different (p-value: <0.05).
+
+Graph of the means:
+
+```{r}
+site1 <- read.csv("../data_raw/Site 1.csv")
+site2 <- read.csv("../data_raw/Site 2.csv")
+
+#Combine dfs
+site1$site <- "Site 1"
+site2$site <- "Site 2"
+combined_data <- rbind(site1, site2)
+
+# Calculate mean and standard error of the mean (SEM) for weight
+weight_summary <- combined_data %>%
+  group_by(site) %>%
+  summarise(
+    mean_weight = mean(weight_g, na.rm = TRUE),
+    sem_weight  = sd(weight_g, na.rm = TRUE) / sqrt(n())
+  )
+
+# Plot mean weight with error bars
+ggplot(weight_summary, aes(x = site, y = mean_weight, fill = site)) +
+  geom_bar(stat = "identity", width = 0.5, color = "black", alpha = 0.5) +
+  geom_errorbar(
+    aes(ymin = mean_weight - sem_weight, ymax = mean_weight + sem_weight), 
+    width = 0.15) +
+  labs(x = NULL, y = "Weight (g)")
+```
+
+
+
+#Graph the relationship between height and weight at each site. Display R^2 value.
+
+```{r}
+
+# --- Site 1 Graph ---
+#fit linear model
+r2_site1 <- summary(lm(weight_g ~ height_cm, data = site1))$r.squared
+
+#plot scatterplot
+plot1 <- ggplot(site1, aes(x = height_cm, y = weight_g)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  annotate("label", 
+    x = min(site1$height_cm), 
+    y = max(site1$weight_g), 
+    label = paste0("R² = ", round(r2_site1, 3)), 
+    hjust = 0, vjust = 1, size = 4.5) +
+  labs(title = "Site 1", x = "Height (cm)", y = "Weight (g)")
+
+print(plot1)
+
+# --- Site 2 Graph ---
+#fit linear model
+r2_site2 <- summary(lm(weight_g ~ height_cm, data = site2))$r.squared
+
+#plot scatterplot
+plot2 <- ggplot(site2, aes(x = height_cm, y = weight_g)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  annotate(
+    "label", 
+    x = min(site2$height_cm), 
+    y = max(site2$weight_g), 
+    label = paste0("R² = ", round(r2_site2, 3)), 
+    hjust = 0, vjust = 1, size = 4.5
+  ) +
+  labs(title = "Site 2", x = "Height (cm)", y = "Weight (g)")
+
+print(plot2)
+```
+
+
+#Why would this relationship be important in an inventory and monitoring class?
+
+This is important because relationships like this are predictive. We can infer based on this graph what the height would be if we can measure the weight of plants and vice versa in the future in these sites. However the relationships on these graphs are weakly correlated and would generally be inaccurate if used in this way.
+
+
+#What are some possible explanations for the similarities and/or differences between the sites? Which seems most likely?
+
+The sites may have different types of plants, different precipitation patterns, occur at different latitudes, have different soil types, face different grazing or herbivory pressures, or different levels of light. For Site 1, if weight decreases as height increases, I imagine there are small shrubs or shortgrasses with tall culms that grow lower to the ground and perhaps lose some herbaceous biomass during their reproductive stage. For Site 2, height and weight are trending together so I imagine these are denser grasses or plants that increase in biomass as they grow taller. 
+
+#Calculate the sample size to produce, with 95% probability, a sample mean within 10% of the true population mean for the weights.
+
+n = ((z*s)/B)^2
+z = 1.96
+s = Sample standard deviation
+B = Desired precision level, otherwise known as margin of error
+
+For Site 1:
 
 
 
