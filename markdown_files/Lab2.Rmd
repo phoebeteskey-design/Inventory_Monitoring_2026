@@ -204,5 +204,16 @@ B = Desired precision level, otherwise known as margin of error
 
 For Site 1:
 
+n= 27
 
+For Site 2:
 
+n= 13
+
+#Why do we care about sample size? What use is it?
+
+Sample size needs to be large enough to capture the population accurately. Your standard error decreases as sample size increases. Management decisions are based on estimates from samples, and being confident in our sampling is critical in making reliable decisions. If the sample size is too small, standard error will be higher, which means less precision.
+
+#If this were an experiment, how could you properly analyze both height and weight as response variables?
+
+I would use an ANOVA and test weight as a function of height, controlling for site. We want to know if weight affects height, despite site differences.

@@ -1,0 +1,26 @@
+---
+title: "Lab 3"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(tidyverse)
+```
+
+# 1.) Calculate the mean and standard error of mesquite density for each plot size and make a graph of the comparison. (Be sure to convert density)
+
+# 2.) Calculate the average time to sample each plot size.
+
+# 3.) In at least a paragraph, answer which is the most precise (least variable) plot size and why.
+
+# 4.) In at least a paragraph, answer which is the most efficient plot size and why.
+
+# 5.) Converting the density to frequency, what plot size worked well for frequency?
+
+# 6.) Theoretically frequency (p in %) and density (d) are related. Some suggest that the conversion from frequency to density is d = -ln(1-p/100). Calculate the estimated density for the 5x5m quadrat frequency data. (Convert to plants per m^2) Does the answer come out the same or different from the actual density answer?
+
+# 7.) Write at least a paragraph commenting about this exercise.
+
+# 8.) For the 2.5x2.5m plot size, calculate teh sample size to produce, with 95% probability, a sample mean within 10% of the true population mean. What does this say about our ability to detect changes with the sample size of 20?
