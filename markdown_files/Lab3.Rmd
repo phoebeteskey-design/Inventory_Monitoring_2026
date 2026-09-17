@@ -5,6 +5,8 @@ output:
   html_document: default
 ---
 
+# Team members: Laura Shriver & Phoebe Teskey
+
 ```{r}
 library(tidyverse)
 library(plotrix)
@@ -137,12 +139,39 @@ ggplot(summary_combined, aes(x = plot_size, y = mean_time, fill = method)) +
 
 # 3.) In at least a paragraph, answer which is the most precise (least variable) plot size and why.
 
+Standard error measures the precision in an estimate. Standard deviation measures the variability within the sample size. According to the standard error calculations, the quadrat size with the lowest standard error is the 50x50cm plot (SE = 0.00), followed by the 10x10m plot (SE = 0.006). The smallest quadrats have zero standard error because they all contained nothing. The largest plot having lower SE than the rest of the quadrats suggests that the population is not highly variable, and also follows the general rule that standard error decreases as sample size increases. Higher standard error means less precision. So, the most precise quadrat size is the 10x10m.
+
 # 4.) In at least a paragraph, answer which is the most efficient plot size and why.
+
+The most efficient plot size was the 50x50cm frequency plots. Frequency is easier and faster to measure since we aren't counting the number of individuals, only the presence or absence of them. The time spent trends upwards with increasing size of quadrat. The density quadrats take anywhere from twice as long to four times as long than the frequency quadrats.
 
 # 5.) Converting the density to frequency, what plot size worked well for frequency?
 
+Scanning the datasheets, I would suggest that the 5x5m size quadrats would be adequate to use for frequency. Smaller than that and I see a lot of zeroes on the datasheet, suggesting that mesquites in this area are spaced wider than 2.5m and so require larger sampling quadrats to capture their spatial arrangement accurately.
+
 # 6.) Theoretically frequency (p in %) and density (d) are related. Some suggest that the conversion from frequency to density is d = -ln(1-p/100). Calculate the estimated density for the 5x5m quadrat frequency data. (Convert to plants per m^2) Does the answer come out the same or different from the actual density answer?
+
+Mesquites occurred in 85% of the 5x5m quadrats. 
+-ln(1-0.85) = 1.897 plants/quadrat
+Convert to density: 5x5 = 25m^2
+1.897/25 = 0.076 plants/m^2
+
+Actual density: 27 plants total
+27/20=1.35
+1.35/25=0.054 plants/m^2
+
+The answers are different but not by much. 
 
 # 7.) Write at least a paragraph commenting about this exercise.
 
-# 8.) For the 2.5x2.5m plot size, calculate teh sample size to produce, with 95% probability, a sample mean within 10% of the true population mean. What does this say about our ability to detect changes with the sample size of 20?
+I found this lab to be helpful for comparing the strengths and weaknesses of different quadrat sizes and their differences side by side as seen in the graphs. Without this exercise I would never have known how to sample nested quadrats in the field. Determining the appropriate quadrat size is important in sampling and is dependent on the size of the species you are sampling. That can be seen clearly here.
+
+# 8.) For the 2.5x2.5m plot size, calculate the sample size to produce, with 95% probability, a sample mean within 10% of the true population mean. What does this say about our ability to detect changes with the sample size of 20?
+
+```{r}
+sd(density$`2.5x2.5m`)
+```
+
+N = ((1.96x2.6)/0.1)^2 = 2629 quadrats
+
+Our 20 samples are woefully inadequate if we want to detect changes in this landscape. Small changes would be completely undetectable, unless we greatly increase the number of samples.
