@@ -7,11 +7,133 @@ output:
 
 ```{r}
 library(tidyverse)
+library(plotrix)
+density <- read_csv("../data_raw/Lab3_Density.csv")
+time_density <- read_csv("../data_raw/Lab3_densitytime.csv")
+time_frequency <- read_csv("../data_raw/Lab3_frequency_time.csv")
 ```
 
 # 1.) Calculate the mean and standard error of mesquite density for each plot size and make a graph of the comparison. (Be sure to convert density)
 
+```{r}
+#longer data tables
+density_data <- density %>%
+  pivot_longer(
+    cols = c(`50x50cm`, `1x1m`, `2.5x2.5m`, `5x5m`, `10x10m`),
+    names_to = "plot_size",
+    values_to = "count"
+  ) %>%
+  mutate(
+    # Set the area in m^2 for each plot size
+    area_m2 = case_when(
+      plot_size == "50x50cm"  ~ 0.25,
+      plot_size == "1x1m"     ~ 1.00,
+      plot_size == "2.5x2.5m" ~ 6.25,
+      plot_size == "5x5m"     ~ 25.00,
+      plot_size == "10x10m"   ~ 100.00), 
+    #convert density
+    density = count/area_m2,
+    #set as factor to order smallest to largest quadrat and order x-axis titles
+    plot_size = factor(plot_size, 
+      levels = c("50x50cm", "1x1m", "2.5x2.5m", "5x5m", "10x10m")
+    )
+  )
+
+#standard error and standard deviation
+summary_density <- density_data %>%
+  group_by(plot_size) %>%
+  summarise(
+    mean_density = mean(density),
+    se_density   = sd(density) / sqrt(n())
+  )
+
+print(summary_density)
+    
+#plot summary stats
+ggplot(summary_density, aes(x = plot_size, y = mean_density, group = 1)) +
+  geom_line(color = "blue", size = 1) +
+  geom_point(color = "blue", size = 3) +
+  geom_errorbar(
+    aes(ymin = mean_density - se_density, ymax = mean_density + se_density,
+    color = "Standard Error ±1 SE"),
+width = 0.15, linewidth = 0.8
+  ) +
+  scale_color_manual(name = "Uncertainty", values = c("Standard Error ±1 SE" = "orange")) +
+  labs(
+    title = "Mesquite Density Mean Across Plot Sizes",
+    x = "Plot Size",
+    y = "Mesquite Density plants/m^2")
+
+```
+
 # 2.) Calculate the average time to sample each plot size.
+
+```{r}
+
+time_density_longer <- time_density %>%
+  pivot_longer(
+    cols = c(`50x50cm`, `1x1m`, `2.5x2.5m`, `5x5m`, `10x10m`),
+    names_to = "plot_size",
+    values_to = "count")
+
+time_density_longer <- time_density_longer %>%
+  mutate(
+    plot_size = factor(
+      plot_size, 
+      levels = c("50x50cm", "1x1m", "2.5x2.5m", "5x5m", "10x10m") ) )
+
+summary_time_density <- time_density_longer %>%
+  group_by(plot_size) %>%
+  summarise(mean_time = mean(count))
+
+time_frequency_longer <- time_frequency %>% 
+  pivot_longer(
+    cols = c(`50x50cm`, `1x1m`, `2.5x2.5m`, `5x5m`, `10x10m`),
+    names_to = "plot_size",
+    values_to = c("count"))
+
+time_frequency_longer <- time_frequency_longer %>% 
+  mutate(
+    plot_size = factor( plot_size,
+    levels = c("50x50cm", "1x1m", "2.5x2.5m", "5x5m", "10x10m")
+  ) )
+
+summary_time_frequency <- time_frequency_longer %>% 
+  group_by(plot_size) %>% 
+  summarise(mean_time = mean(count))
+
+# 1. Combine both summaries and tag the sampling method
+summary_combined <- bind_rows(
+  summary_time_density %>% mutate(method = "Density"),
+  summary_time_frequency %>% mutate(method = "Frequency")
+)
+
+# 2. Plot side-by-side bars using position_dodge()
+ggplot(summary_combined, aes(x = plot_size, y = mean_time, fill = method)) +
+  geom_col(position = position_dodge(0.8), width = 0.7) +
+  geom_text(
+    aes(label = round(mean_time, 1)),
+    position = position_dodge(0.8),
+    vjust = -0.5,
+    size = 3.5
+  ) +
+  scale_fill_manual(
+    name = "Sampling Method",
+    values = c("Density" = "blue", "Frequency" = "orange")
+  ) +
+  labs(
+    title = "Mean Sampling Time Comparison Across Plot Sizes",
+    x = "Plot Size",
+    y = "Mean Time (seconds)"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    legend.position = "top"
+  )
+  
+```
+
 
 # 3.) In at least a paragraph, answer which is the most precise (least variable) plot size and why.
 
